@@ -57,7 +57,7 @@ const HomeScreen = ({ setView, setCurrentBuilding, buildings, loading, error, vi
                         source={profile?.avatar_url ? { uri: profile.avatar_url } : require('../../assets/avatar-placeholder.png')}
                         style={styles.avatarGray}
                     />
-                    <Text style={styles.profileTextGray}>HI {profile?.username?.toUpperCase() || 'EXPLORER'}!</Text>
+                    <Text style={styles.profileTextGray}>HI {profile?.username?.toUpperCase() }!</Text>
                 </TouchableOpacity>
                 <View style={styles.visitedCountContainer}>
                     <Text style={styles.visitedCount}>{visitedCount}</Text>

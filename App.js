@@ -90,16 +90,24 @@ export default function App() {
 
     const fetchNearbyBuildings = async (coords) => {
         setIsLoadingNearby(true);
-        setNearbyError(null);
         try {
-            const { data, error } = await supabase.rpc('nearby_buildings', { lat: coords.latitude, long: coords.longitude });
-            if (error) throw error;
-            setNearbyBuildings(data || []);
+          const { data, error } = await supabase.rpc('nearby_buildings', {
+            lat: coords.latitude,
+            long: coords.longitude,
+          });
+    
+          if (error) {
+            // This will send the error to the catch block
+            throw error; 
+          }
+          
+          setNearbyBuildings(data || []);
+    
         } catch (err) {
-            console.error("Error fetching nearby buildings:", err);
-            setNearbyError("Failed to fetch nearby buildings.");
+          console.error('Error fetching nearby buildings:', err);
         } finally {
-            setIsLoadingNearby(false);
+          // This block runs no matter what, ensuring the loader always stops.
+          setIsLoadingNearby(false);
         }
     };
 

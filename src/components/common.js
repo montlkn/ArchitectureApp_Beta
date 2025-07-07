@@ -1,31 +1,76 @@
 // =================================================================
-// FILE: src/components/common.js
+// FILE: src/components/common.js (Final Version)
 // =================================================================
 import React from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { Feather } from '@expo/vector-icons';
 import { styles } from '../config/styles';
 
-export const LoadingView = ({ message }) => ( <View style={styles.centerScreen}><ActivityIndicator size="large" color="#000000" /><Text style={{ marginTop: 15, fontSize: 16 }}>{message}</Text></View> );
-export const ErrorView = ({ message, setView }) => ( <View style={styles.centerScreen}><Text style={styles.errorTitle}>Scan Failed</Text><Text style={styles.errorMessage}>{message}</Text><TouchableOpacity onPress={() => setView('HOME')} style={styles.button}><Text style={styles.buttonText}>Try Again</Text></TouchableOpacity></View> );
+export const LoadingView = ({ message }) => (
+    <View style={styles.centerScreen}>
+        <ActivityIndicator size="large" />
+        <Text style={{marginTop: 10}}>{message || 'Loading...'}</Text>
+    </View>
+);
 
-export const HomeIcon = ({isActive}) => <Text style={[styles.icon, isActive && styles.iconActive]}>🏠</Text>;
-export const BookmarkIcon = ({isActive}) => <Text style={[styles.icon, isActive && styles.iconActive]}>🔖</Text>;
-export const CameraIcon = ({isActive}) => <Text style={[styles.icon, isActive && styles.iconActive, styles.cameraIconSpecial]}>📷</Text>;
-export const MapIcon = ({isActive}) => <Text style={[styles.icon, isActive && styles.iconActive]}>🗺️</Text>;
-export const DirectionsIcon = () => <Text style={styles.directionsIcon}>➤</Text>;
+export const ErrorView = ({ message, setView }) => (
+    <View style={styles.centerScreen}>
+        <Text style={styles.errorTitle}>Oops!</Text>
+        <Text style={styles.errorMessage}>{message}</Text>
+        <TouchableOpacity style={styles.button} onPress={() => setView('HOME')}>
+            <Text style={styles.buttonText}>Go Home</Text>
+        </TouchableOpacity>
+    </View>
+);
 
-export const NavBar = ({ view, setView }) => ( <View style={styles.navBar}><TouchableOpacity onPress={() => setView('HOME')} style={styles.navBarItem}><HomeIcon isActive={view === 'HOME'} /></TouchableOpacity><TouchableOpacity onPress={() => setView('PASSPORT')} style={styles.navBarItem}><BookmarkIcon isActive={view === 'PASSPORT'} /></TouchableOpacity><TouchableOpacity onPress={() => setView('CAMERA')} style={styles.navBarItem}><CameraIcon isActive={view === 'CAMERA'} /></TouchableOpacity><TouchableOpacity onPress={() => setView('MAP')} style={styles.navBarItem}><MapIcon isActive={view === 'MAP'} /></TouchableOpacity></View> );
+export const NavBar = ({ view, setView }) => (
+    <View style={styles.navBar}>
+        <TouchableOpacity style={styles.navBarItem} onPress={() => setView('HOME')}>
+            <Text style={[styles.icon, view === 'HOME' && styles.iconActive]}>🏠</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navBarItem} onPress={() => setView('PASSPORT')}>
+            <Text style={[styles.icon, view === 'PASSPORT' && styles.iconActive]}>🎟️</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navBarItem} onPress={() => setView('CAMERA')}>
+            <Text style={styles.cameraIconSpecial}>📸</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navBarItem} onPress={() => setView('MAP')}>
+            <Text style={[styles.icon, view === 'MAP' && styles.iconActive]}>🗺️</Text>
+        </TouchableOpacity>
+    </View>
+);
 
-export const SwipeableListItem = ({ building, onBuildingPress, onDelete }) => {
-    const renderRightActions = () => (<TouchableOpacity onPress={onDelete} style={styles.deleteAction}><Text style={styles.deleteText}>Delete</Text></TouchableOpacity>);
-    return (
-        <Swipeable renderRightActions={renderRightActions}>
-            <TouchableOpacity onPress={() => onBuildingPress(building)} style={styles.buildingItem}>
-                <Text style={styles.expandedListItemText} numberOfLines={1}>{building.des_addres || building.name}</Text>
-                <View style={styles.swipeIconContainer}><Feather name="menu" size={24} color="#cccccc" /></View>
-            </TouchableOpacity>
-        </Swipeable>
-    );
+// Corrected SwipeableListItem Component
+export const SwipeableListItem = ({ item, onPress, onDelete, expanded, editMode, children }) => {
+  
+  const renderRightActions = () => (
+    <TouchableOpacity onPress={onDelete} style={styles.deleteAction}>
+      <Text style={styles.deleteText}>Delete</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <Swipeable renderRightActions={editMode ? renderRightActions : null}>
+      <TouchableOpacity onPress={onPress} style={styles.buildingItem}>
+        {item.photo_url && (
+          <Image
+            source={{ uri: item.photo_url }}
+            style={styles.listItemAvatar}
+          />
+        )}
+        <View style={{ flex: 1, paddingVertical: 10, justifyContent: 'center' }}>
+          {children}
+        </View>
+        <Text style={styles.arrowIcon}>{expanded ? '▲' : '▼'}</Text>
+      </TouchableOpacity>
+    </Swipeable>
+  );
 };
+
+export const BookmarkIcon = () => (
+  <Text style={{fontSize: 20}}>🔖</Text>
+);
+
+export const DirectionsIcon = () => (
+  <Text style={{fontSize: 20}}>🗺️</Text>
+);
