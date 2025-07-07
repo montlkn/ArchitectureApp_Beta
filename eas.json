@@ -1,0 +1,32 @@
+{
+  "cli": {
+    "version": ">= 7.6.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "bundleIdentifier": "com.lucienmount.architectureexplorer.dev",
+        "appName": "ArchExplorer"
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "ios": {
+        "autoIncrement": true
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "lucienmount@gmail.com",
+        "ascAppId": "6559556156",
+        "appleTeamId": "5JRD794HZ9"
+      }
+    }
+  }
+}
