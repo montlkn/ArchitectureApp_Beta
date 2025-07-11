@@ -1,6 +1,7 @@
 // =================================================================
 // FILE: App.js (Final Navigation Version)
 // =================================================================
+import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
@@ -37,20 +38,13 @@ export default function App() {
     }
 
     return (
-        <SafeAreaProvider>
-            <NavigationContainer>
-                <Stack.Navigator screenOptions={{ headerShown: false }}>
-                    {session && session.user ? (
-                        <>
-                            <Stack.Screen name="Main" component={MainTabs} />
-                            <Stack.Screen name="BuildingInfo" component={BuildingInfoScreen} options={{ presentation: 'modal' }}/>
-                            <Stack.Screen name="Camera" component={CameraScreen} options={{ presentation: 'modal' }}/>
-                        </>
-                    ) : (
-                        <Stack.Screen name="Auth" component={AuthFlow} />
-                    )}
-                </Stack.Navigator>
-            </NavigationContainer>
-        </SafeAreaProvider>
+        <GestureHandlerRootView style={{flex: 1}}>
+            {session && session.user ? (
+                // The MainTabs component now handles the nav bar and safe areas
+                <MainTabs />
+            ) : (
+                <AuthFlow /> 
+            )}
+        </GestureHandlerRootView>
     );
 }
