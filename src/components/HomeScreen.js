@@ -1,11 +1,13 @@
 // =================================================================
-// FILE: src/components/HomeScreen.js (Functionality Restored)
+// FILE: src/components/HomeScreen.js (Final Version)
 // =================================================================
 import React, { useState, useEffect, useCallback } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView, View, Text, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import * as Haptics from 'expo-haptics';
+import { useIsFocused } from '@react-navigation/native';
 import { supabase } from '../config/supabase';
 import { styles } from '../config/styles';
 import { capitalize } from '../utils/helpers';
@@ -17,8 +19,10 @@ const HomeScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    
+    const isFocused = useIsFocused();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -50,18 +54,20 @@ const HomeScreen = ({ navigation }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (isFocused) {
+            fetchData();
+        }
+    }, [isFocused, fetchData]);
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         await fetchData();
         setRefreshing(false);
-    }, []);
+    }, [fetchData]);
 
     const handleBuildingPress = (building) => {
         navigation.navigate('BuildingInfo', { building });
@@ -91,7 +97,6 @@ const HomeScreen = ({ navigation }) => {
                             <Image source={{ uri: building.photo_url || 'https://placehold.co/80x80' }} style={styles.listItemAvatar} />
                             <View style={{ flex: 1 }}>
                                 <Text style={{ fontWeight: 'bold' }}>{building.name || building.des_addres}</Text>
-                                {/* FIX: This line restores the architect and date info */}
                                 <Text style={{ color: 'gray' }}>{[capitalize(building.arch_build), building.date_combo].filter(Boolean).join(' | ')}</Text>
                                 <Text style={styles.walkTimeText}>{walkTimeText}</Text>
                             </View>
@@ -103,31 +108,34 @@ const HomeScreen = ({ navigation }) => {
     };
 
     return (
-        <ScrollView 
-            style={styles.screen}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        >
-            <View style={styles.header}>
-                 <TouchableOpacity onPress={() => navigation.navigate('Passport')} style={styles.profileLinkGray}>
-                    <Image
-                        source={profile?.avatar_url ? { uri: profile.avatar_url } : require('../../assets/avatar-placeholder.png')}
-                        style={styles.avatarGray}
-                    />
-                    <Text style={styles.profileTextGray}>HI {profile?.username?.toUpperCase() || 'EXPLORER'}!</Text>
-                </TouchableOpacity>
-                <View style={styles.visitedCountContainer}>
-                    <Text style={styles.visitedCount}>{visitedCount}</Text>
-                    <Text style={styles.visitedCountLabel}>VISITED</Text>
+        <SafeAreaView style={styles.container}>
+            <ScrollView 
+                style={styles.screen}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            >
+                <View style={styles.header}>
+                     <TouchableOpacity onPress={() => navigation.navigate('Passport')} style={styles.profileLinkGray}>
+                        <Image
+                            key={profile?.avatar_url}
+                            source={profile?.avatar_url ? { uri: profile.avatar_url } : require('../../assets/avatar-placeholder.png')}
+                            style={styles.avatarGray}
+                        />
+                        <Text style={styles.profileTextGray}>HI {profile?.username?.toUpperCase() || 'EXPLORER'}!</Text>
+                    </TouchableOpacity>
+                    <View style={styles.visitedCountContainer}>
+                        <Text style={styles.visitedCount}>{visitedCount}</Text>
+                        <Text style={styles.visitedCountLabel}>VISITED</Text>
+                    </View>
                 </View>
-            </View>
-            <View style={[styles.section, { paddingTop: 20 }]}>
-                <TouchableOpacity onPress={() => navigation.navigate('Map')} style={styles.sectionHeader}>
-                    <Text style={styles.title}>Architecture Around You</Text>
-                    <Feather name="arrow-right" size={32} color="black" />
-                </TouchableOpacity>
-                {renderContent()}
-            </View>
-        </ScrollView>
+                <View style={[styles.section, { paddingTop: 20 }]}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Map')} style={styles.sectionHeader}>
+                        <Text style={styles.title}>Architecture Around You</Text>
+                        <Feather name="arrow-right" size={32} color="black" />
+                    </TouchableOpacity>
+                    {renderContent()}
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 

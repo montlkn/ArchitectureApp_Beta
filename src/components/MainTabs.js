@@ -1,9 +1,8 @@
 // =================================================================
-// FILE: src/components/MainTabs.js (Corrected Version)
+// FILE: src/components/MainTabs.js (Final Version)
 // =================================================================
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// FIX #1: Added TouchableOpacity to the import list
 import { Text, View, TouchableOpacity } from 'react-native';
 
 import HomeScreen from './HomeScreen';
@@ -12,13 +11,11 @@ import PassportScreen from './PassportScreen';
 
 const Tab = createBottomTabNavigator();
 
-// FIX #2: Define an empty component once to prevent re-renders
 const EmptyScreen = () => null;
 
-// Custom Tab Bar component to match your style
 const CustomTabBar = ({ state, descriptors, navigation }) => {
     return (
-        <View style={{ flexDirection: 'row', height: 80, borderTopWidth: 1, borderTopColor: '#e0e0e0', backgroundColor: '#fff' }}>
+        <View style={{ flexDirection: 'row', height: 80, borderTopWidth: 1, borderTopColor: '#e0e0e0', backgroundColor: '#fff', paddingBottom: 20 }}>
             {state.routes.map((route, index) => {
                 const { options } = descriptors[route.key];
                 const label = options.tabBarLabel;
@@ -59,12 +56,12 @@ const MainTabs = () => {
             <Tab.Screen name="Passport" component={PassportScreen} options={{ tabBarLabel: 'Passport' }} />
             <Tab.Screen
                 name="CameraTab"
-                component={EmptyScreen} // Use the empty component here
+                component={EmptyScreen}
                 options={{ tabBarLabel: 'Camera' }}
                 listeners={({ navigation }) => ({
                     tabPress: (e) => {
-                        e.preventDefault(); // Prevent default tab navigation
-                        navigation.navigate('Camera'); // Navigate to the modal camera screen
+                        e.preventDefault();
+                        navigation.navigate('Camera');
                     },
                 })}
             />
