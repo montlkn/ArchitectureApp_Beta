@@ -41,44 +41,26 @@ export default ({ config }) => {
 
     // --- Android Configuration ---
     android: {
-      ...config.android, // Spread existing Android config
-      adaptiveIcon: {
-        foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#ffffff"
-      },
-      package: "com.lucienmount.architectureexplorer",
-      permissions: [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION"
-      ]
+      // ... your existing android config
     },
     web: {
-      ...config.web,
-      favicon: "./assets/favicon.png"
+      // ... your existing web config
     },
 
     // --- Plugins ---
     plugins: [
+      // ... your existing plugins
       [
-        "expo-camera",
+        "expo-build-properties",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan landmarks."
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ],
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to find nearby landmarks."
-        }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to let you select a profile picture."
-        }
-      ]
+      ["expo-camera", { /* ... */ }],
+      ["expo-location", { /* ... */ }],
+      ["expo-image-picker", { /* ... */ }]
     ],
 
     // --- Extra Data (merged for secure key loading) ---
@@ -88,11 +70,9 @@ export default ({ config }) => {
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
       supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
       googleCloudVisionApiKey: process.env.EXPO_PUBLIC_GOOGLE_CLOUD_VISION_API_KEY,
-      // ================= FIX ================
-      // Corrected the environment variable name to match .env file
-      googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+      googleMapsApiKey: process.env.EXPO_PUBLIC_Maps_API_KEY,
       
-      // EAS Project ID
+      // FIX: Add this block as requested by the error message
       eas: {
         "projectId": "f5983105-64ae-4406-ace3-b226b79c109b"
       }

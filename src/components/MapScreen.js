@@ -12,7 +12,7 @@ import { styles as externalStyles } from "../config/styles";
 import { getColorForStyle, cleanMapStyle } from "../config/mapStyles";
 import { capitalize } from "../utils/helpers";
 
-const ClusterMarker = ({ pointCount, coordinate, onPress }) => {
+const ClusterMarker = React.memo(({ pointCount, coordinate, onPress }) => {
   const size = 35 + String(pointCount).length * 5;
   return (
     <Marker coordinate={coordinate} onPress={onPress} tracksViewChanges={false}>
@@ -28,7 +28,7 @@ const ClusterMarker = ({ pointCount, coordinate, onPress }) => {
       </View>
     </Marker>
   );
-};
+});
 
 const BuildingMarker = React.memo(({ marker, zoom, onPress }) => {
   const color = getColorForStyle(marker.style_prim);
