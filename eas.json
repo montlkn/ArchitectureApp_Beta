@@ -5,11 +5,7 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "ios": {
-        "bundleIdentifier": "com.lucienmount.architectureexplorer.dev",
-        "appName": "ArchExplorer"
-      }
+      "distribution": "internal"
     },
     "preview": {
       "distribution": "internal"

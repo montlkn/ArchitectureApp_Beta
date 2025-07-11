@@ -1,5 +1,5 @@
 // =================================================================
-// FILE: src/components/MapScreen.js (Final Version with Labels & Legend)
+// FILE: src/components/MapScreen.js (Final Navigation & Stable Keys)
 // =================================================================
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
@@ -9,7 +9,6 @@ import { styles as externalStyles } from '../config/styles';
 import { getColorForStyle, cleanMapStyle } from '../config/mapStyles';
 import { capitalize } from '../utils/helpers';
 
-// Memoized components prevent re-rendering if their props don't change
 const ClusterMarker = React.memo(({ pointCount, coordinate, onPress }) => {
     const size = 35 + (String(pointCount).length * 5);
     return (
@@ -21,13 +20,11 @@ const ClusterMarker = React.memo(({ pointCount, coordinate, onPress }) => {
     );
 });
 
-// FIX: Building marker now accepts a zoom level to conditionally show its label
 const BuildingMarker = React.memo(({ marker, zoom, onPress }) => {
     const color = getColorForStyle(marker.style_prim);
     return (
         <Marker coordinate={{latitude: marker.latitude, longitude: marker.longitude}} onPress={onPress} tracksViewChanges={false}>
             <View style={externalStyles.mapMarkerContainer}>
-                {/* Show label only when zoomed in close (zoom level > 15) */}
                 {zoom > 15 && (
                      <Text style={[externalStyles.mapMarkerText, { backgroundColor: color, borderColor: color }]} numberOfLines={1}>
                         {marker.name}
@@ -40,7 +37,6 @@ const BuildingMarker = React.memo(({ marker, zoom, onPress }) => {
 });
 
 const MapLegend = React.memo(({ markers }) => {
-    // Create a list of unique styles currently on the map
     const activeStyles = markers.reduce((acc, marker) => {
         if (!marker.is_cluster && marker.style_prim) {
             const style = capitalize(marker.style_prim);
@@ -48,13 +44,11 @@ const MapLegend = React.memo(({ markers }) => {
         }
         return acc;
     }, {});
-
     const sortedStyles = Object.entries(activeStyles).sort((a, b) => b[1] - a[1]);
-
     return (
         <View style={externalStyles.mapLegend}>
             <Text style={externalStyles.legendTitle}>Building Styles</Text>
-            {sortedStyles.slice(0, 5).map(([name, count]) => ( // Show top 5 styles
+            {sortedStyles.slice(0, 5).map(([name, count]) => (
                 <View key={name} style={externalStyles.legendItem}>
                     <View style={[externalStyles.legendColorBox, { backgroundColor: getColorForStyle(name) }]} />
                     <Text style={externalStyles.legendText}>{name} ({count})</Text>
@@ -64,17 +58,14 @@ const MapLegend = React.memo(({ markers }) => {
     );
 });
 
-
-const MapScreen = ({ setView, setCurrentBuilding, userLocation }) => {
+const MapScreen = ({ navigation }) => { // FIX: Use the 'navigation' prop
     const mapRef = useRef(null);
     const [markers, setMarkers] = useState([]);
     const [loading, setLoading] = useState(true);
     const timeoutRef = useRef(null);
     const [region, setRegion] = useState({
-        latitude: userLocation?.latitude || 40.7128,
-        longitude: userLocation?.longitude || -74.0060,
-        latitudeDelta: 0.1,
-        longitudeDelta: 0.05,
+        latitude: 40.7128, longitude: -74.0060, // Default to NYC
+        latitudeDelta: 0.1, longitudeDelta: 0.05,
     });
     
     const zoom = Math.round(Math.log(360 / region.longitudeDelta) / Math.LN2);
@@ -85,10 +76,8 @@ const MapScreen = ({ setView, setCurrentBuilding, userLocation }) => {
         const currentZoom = Math.round(Math.log(360 / currentRegion.longitudeDelta) / Math.LN2);
         const { longitude, latitude, longitudeDelta, latitudeDelta } = currentRegion;
         const { data, error } = await supabase.rpc('get_map_clusters', {
-            min_lon: longitude - longitudeDelta / 2,
-            min_lat: latitude - latitudeDelta / 2,
-            max_lon: longitude + longitudeDelta / 2,
-            max_lat: latitude + latitudeDelta / 2,
+            min_lon: longitude - longitudeDelta / 2, min_lat: latitude - latitudeDelta / 2,
+            max_lon: longitude + longitudeDelta / 2, max_lat: latitude + latitudeDelta / 2,
             p_zoom: currentZoom,
         });
         if (error) console.error("Error fetching map clusters:", error);
@@ -118,8 +107,8 @@ const MapScreen = ({ setView, setCurrentBuilding, userLocation }) => {
             };
             mapRef.current.animateToRegion(newRegion, 300);
         } else {
-            setCurrentBuilding(marker);
-            setView('BUILDING_INFO');
+            // FIX: Use navigation to go to the BuildingInfo screen
+            navigation.navigate('BuildingInfo', { building: marker });
         }
     };
     
@@ -139,13 +128,11 @@ const MapScreen = ({ setView, setCurrentBuilding, userLocation }) => {
                 )}
             </MapView>
             
-            <TouchableOpacity onPress={() => setView('HOME')} style={externalStyles.mapCloseButton}>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')} style={externalStyles.mapCloseButton}>
                 <Text style={{color: 'black', fontSize: 18, fontWeight: 'bold'}}>X</Text>
             </TouchableOpacity>
             
-            {/* FIX: Add the legend to the map UI */}
             <MapLegend markers={markers} />
-
             {loading && <ActivityIndicator size="large" style={{position: 'absolute', top: '50%', alignSelf: 'center'}} />}
         </View>
     );
